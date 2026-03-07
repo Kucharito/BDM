@@ -28,11 +28,24 @@ class S256Point(Point):
 
     def sec(self, compressed=True):
     #TODO 5: SEC Uncompressed and Compressed SEC Format
-        raise NotImplementedError
+        if compressed:
+            if self.y.num % 2 == 0:
+                return b"\x02" + self.x.num.to_bytes(32, byteorder="big")
+            else:
+                return b"\x03" + self.x.num.to_bytes(32, byteorder="big")
+        else:
+                return b"\x04" + self.x.num.to_bytes(32, byteorder="big") + self.y.num.to_bytes(32, byteorder="big")
 
     def address(self, compressed=True, network="mainnet"):
     # TODO 4: Address
-        raise NotImplementedError
+        sec = self.sec(compressed)
+        h160 = hash160(sec)
+        if network == "mainnet":
+            prefix = b"\x00"
+        else: 
+            prefix = b"\x6f"
+        return encode_base58_checksum(prefix + h160)
+          
 
     def verify(self, z, sig):
         s_inv = pow(sig.s, -1, N)

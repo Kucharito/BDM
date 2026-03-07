@@ -25,7 +25,21 @@ class Signature:
 
     def der(self):
     #TODO 2: Implement DER signature
-        raise NotImplementedError    
+        rbinary = self.r.to_bytes(32, byteorder="big")
+        r_without_leading_zeros = rbinary.lstrip(b"\x00")
+        if r_without_leading_zeros[0] & 0x80:
+           r_without_leading_zeros = b"\x00" + r_without_leading_zeros
+        
+        sbinary = self.s.to_bytes(32, byteorder="big")
+        s_without_leading_zeros = sbinary.lstrip(b"\x00")
+        if s_without_leading_zeros[0] & 0x80:
+            s_without_leading_zeros = b"\x00" + s_without_leading_zeros  
+        
+        result = b'\x02' + bytes([len(r_without_leading_zeros)])+ r_without_leading_zeros
+        result += b'\x02' + bytes([len(s_without_leading_zeros)]) + s_without_leading_zeros
+        
+        return b'\x30' + bytes([len(result)]) + result
+           
 
     @classmethod
     def parse(cls, signature_bin):

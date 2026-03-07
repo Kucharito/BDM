@@ -24,7 +24,14 @@ class PrivateKey:
 
     def sign(self, z):
     # TODO 1: Sign
-        raise NotImplementedError
+        k = randint(1, N-1)
+        R = k*G
+        r = R.x.num
+        k_inv = pow(k, -1, N)
+        s = (z + r*self.secret)*k_inv % N
+        if s > N/2:
+            s = N - s
+        return Signature(r, s)
 
 
 class PrivateKeyTest(TestCase):

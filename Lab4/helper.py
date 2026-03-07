@@ -35,7 +35,20 @@ def hash256(s):
 
 def encode_base58(s):
     #TODO 3: Implement base58 encode (use BASE58_ALPHABET)
-    raise NotImplementedError
+    count = 0
+    for c in s:
+        if c == 0:
+            count = count +1
+        else:
+            break
+    num = int.from_bytes(s, byteorder="big")
+    result = ""
+    while num > 0:
+        mod = num % 58
+        num = num // 58
+        result = BASE58_ALPHABET[mod] + result
+    return "1"*count + result
+
 
 def encode_base58_checksum(raw):
     """Takes bytes and turns it into base58 encoding with checksum"""
