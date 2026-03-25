@@ -99,14 +99,18 @@ class Tx:
     def parse(cls, s, testnet=False):
         # return cls(version, inputs, outputs, locktime, testnet=testnet)
         #TODO 3: Parse the transaction data from the stream and return a Tx object
+        # version (4bytes)
+        # input (varint(s))
+        # output (varint(s))
+        # locktime (4bytes)
         version = little_endian_to_int(s.read(4))
         num_inputs = read_varint(s)
         
         inputs = []
         for _ in range(num_inputs):
             inputs.append(TxIn.parse(s))
+            
         num_outputs = read_varint(s)
-        
         outputs = []
         for _ in range(num_outputs):
             outputs.append(TxOut.parse(s))
@@ -128,6 +132,7 @@ class Tx:
 
     def fee(self):
         #TODO 4: Calculate the fee of the transaction
+        #sucet vsetkych vstupov - sucet vsetkych vystupov
         input_sum = sum(tx_in.value(testnet=self.testnet) for tx_in in self.tx_ins)
         output_sum = sum(tx_out.amount for tx_out in self.tx_outs)
         return input_sum - output_sum

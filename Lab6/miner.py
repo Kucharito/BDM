@@ -23,19 +23,51 @@ class Miner:
             raise ValueError("Invalid mode. Choose 'threading' or 'multiprocessing'.")
 
     def difficulty_to_target(self, difficulty):
+        #TODO2: Calculate the target from the difficulty
         max_target = 0xFFFF * 256**(0x1D - 3)  
         target = max_target // difficulty
         return target
 
-        raise NotImplementedError("TODO 2: Calculate the target from the difficulty")
-
     def mine_single_worker(self, start_nonce=0, end_nonce=2**32, multi=False):
-        # TODO 3: Implement the mining algorithm
-        
+    # TODO 3: Implement the mining algorithm
+        for nonce in range(start_nonce, end_nonce):
+            if multi and self.found.is_set():
+                return None
 
-        raise NotImplementedError("TODO 3: Implement the mining algorithm")
+            self.block_header.nonce = nonce
+            block_hash = self.block_header.hash()
+
+            if int(block_hash, 16) <= self.target:
+                with self.lock:
+                    if multi and self.found.is_set():
+                        return None
+
+                    self.block_header.nonce = nonce
+                    self.result = self.block_header
+
+                    if multi:
+                        self.found.set()
+                        if self.mode == 'multiprocessing':
+                            self.result_queue.put(self.block_header)
+                            return None
+
+                    return self.block_header
+
+        return None
 
     def mine_multi_worker(self, nonce_ranges):
-        # TODO 4: Implement the mining algorithm with multiple workers
+        workers = []
 
-        raise NotImplementedError("TODO 4: Implement the mining algorithm with multiple workers")
+        for start_nonce, end_nonce in nonce_ranges:
+            w = self.worker(target=self.mine_single_worker, args=(start_nonce, end_nonce, True))
+            workers.append(w)
+            w.start()
+
+        for w in workers:
+            w.join()
+
+        if self.mode == 'multiprocessing':
+            if not self.result_queue.empty():
+                self.result = self.result_queue.get()
+
+        return self.result

@@ -9,8 +9,10 @@ class Bip39:
         self.mnemo = Mnemonic(language)
     
     def generate_seed(self, password=None):
-        #TODO 1: Implement the generate_seed method that takes an optional password and returns the seed and the mnemonic phrase.
-        phrase = self.mnemo.generate(strength=256)
+        # pouzit mnemo na generate a na seed
+        # mnemonic phrase (128 bits)
+        phrase = self.mnemo.generate(strength=128)
+        # Optional passphrase
         passphrase = "" if password is None else password
         seed = self.mnemo.to_seed(phrase, passphrase=passphrase)
         return seed, phrase
@@ -24,8 +26,9 @@ class Bip39:
         return btc_address
 
     def backup_from_mnemonic(self, phrase, password=None):
-        #TODO 2: Implement the backup_from_mnemonic method that takes a mnemonic phrase and an optional password and returns the seed.
+        # passphrase uz poznam nemusim generovat
         passphrase = "" if password is None else password
+        # Same phrase + same passphrase => same seed => same wallet keys/addresses.
         seed = self.mnemo.to_seed(phrase, passphrase=passphrase)
         return seed
 

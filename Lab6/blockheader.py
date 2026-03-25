@@ -29,7 +29,7 @@ class BlockHeader:
         nonce_bytes = self.nonce.to_bytes(4, byteorder='little')
         
         header = version_bytes + prev_hash_bytes + merkle_root + ntime_bytes + nbits_bytes + nonce_bytes
-        hash_result = sha256(sha256(header).digest()).digest()[::-1].hex()  # double SHA-256 and reverse for big-endian
+        hash_result = sha256(sha256(header).digest()).digest()[::-1].hex() 
         return hash_result
         
         
