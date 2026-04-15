@@ -57,34 +57,16 @@ class ContractDeploy:
         return tx_receipt.contractAddress
 
     def call_function(self, function_name, args, gas=200000, gas_price=20000000000):
-        # Načítanie kontraktu
-        contract = self.w3.eth.contract(
-            address=self.contract_address,
-            abi=self.contract_abi
-        )
-
-        # Získanie funkcie z kontraktu
-        function = contract.functions[function_name](*args)
-
-        # Odhadnutie nákladov na gas
-        estimated_gas = function.estimateGas({'from': self.account})
-
-        # Transakcia
-        tx = function.buildTransaction({
-            'from': self.account,
+        tx = getattr(self.contract_instance.functions, function_name)(*args).build_transaction({
+            'from': self.w3.eth.default_account,
+            'nonce': self.w3.eth.get_transaction_count(self.w3.eth.default_account),
             'gas': gas,
-            'gasPrice': gas_price,
-            'nonce': self.w3.eth.getTransactionCount(self.account),
+            'gasPrice': self.w3.to_wei(gas_price, 'gwei')
         })
 
-        # Podpisanie a odoslanie transakcie
-        signed_tx = self.w3.eth.account.signTransaction(tx, private_key=self.private_key)
-        tx_hash = self.w3.eth.sendRawTransaction(signed_tx.rawTransaction)
-
-        # Čakanie na potvrdenie
-        tx_receipt = self.w3.eth.waitForTransactionReceipt(tx_hash)
-
-        return tx_receipt
+        signed_tx = self.w3.eth.account.sign_transaction(tx, self.account._private_key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        return self.w3.eth.wait_for_transaction_receipt(tx_hash)
 
     def get_value(self, function_name):
         return self.contract_instance.functions[function_name]().call()
@@ -92,7 +74,7 @@ class ContractDeploy:
     def load_contract(self, contract_address, abi):
         # TODO: Implement load_contract method for loading a contract from an address and ABI
         self.contract_instance = self.w3.eth.contract(
-            address=Web3.to_checksum_address(contract_address),
+            address=contract_address,
             abi=abi
         )
         return self.contract_instance
