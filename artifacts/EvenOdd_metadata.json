@@ -1,0 +1,65 @@
+{
+	"compiler": {
+		"version": "0.8.34+commit.80d5c536"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "number",
+						"type": "uint256"
+					}
+				],
+				"name": "isEven",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Lab9/Task/task4.sol": "EvenOdd"
+		},
+		"evmVersion": "osaka",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Lab9/Task/task4.sol": {
+			"keccak256": "0x2ba7d6fbda00b98cfd0cecc636bc587373ffafa97069db75b99dcfcd3a4729ba",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://25e93900b40186cdaab9975bc82d3042852b070c76b27c7173149913d4f16243",
+				"dweb:/ipfs/QmPYyZwGKNsLzo3Ga8s7K9ZEBCUjUqV7UFEy7tmYK1zncd"
+			]
+		}
+	},
+	"version": 1
+}

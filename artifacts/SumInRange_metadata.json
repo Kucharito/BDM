@@ -1,0 +1,70 @@
+{
+	"compiler": {
+		"version": "0.8.34+commit.80d5c536"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "start",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "to",
+						"type": "uint256"
+					}
+				],
+				"name": "sum",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Lab9/Task/SumInRange.sol": "SumInRange"
+		},
+		"evmVersion": "osaka",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Lab9/Task/SumInRange.sol": {
+			"keccak256": "0x9ef39586ef429d85bc67dc859a5666987b0dd4a4f10810679406c850e496e734",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://3282b95d6b5eb0d97e1047464432d724df9aaf5a3c17262c66536911c81d55b0",
+				"dweb:/ipfs/QmdfBdBL9uGR9gacps5bhmBsyUVpq2BZtiySTCEMP2ZeSq"
+			]
+		}
+	},
+	"version": 1
+}

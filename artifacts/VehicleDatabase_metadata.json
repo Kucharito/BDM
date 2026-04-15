@@ -1,0 +1,151 @@
+{
+	"compiler": {
+		"version": "0.8.34+commit.80d5c536"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_licensePlate",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_mileage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_name",
+						"type": "string"
+					}
+				],
+				"name": "addVehicle",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getAllVehicles",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "licensePlate",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "mileage",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "name",
+								"type": "string"
+							}
+						],
+						"internalType": "struct VehicleDatabase.Vehicle[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_licensePlate",
+						"type": "string"
+					}
+				],
+				"name": "getVehicle",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_licensePlate",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_mileage",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_name",
+						"type": "string"
+					}
+				],
+				"name": "updateVehicle",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Lab9/Task/VehicleDatabase.sol": "VehicleDatabase"
+		},
+		"evmVersion": "osaka",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Lab9/Task/VehicleDatabase.sol": {
+			"keccak256": "0x2570ee361f0d08ae80fcbe479e5619c017f7da81cdc2aced29fd405fa31ec7bf",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://167f87c5c66906e47f9c4213cf6712cb621fb8c2f9ca9621d00a62b237893fd9",
+				"dweb:/ipfs/QmQeG2CNjJyCgusTd9nz8U5Tq1akVgQ5ycAgi4moQGGR23"
+			]
+		}
+	},
+	"version": 1
+}

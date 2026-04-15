@@ -1,0 +1,82 @@
+{
+  "contracts/1_Storage.sol": {
+    "__sources__": {
+      "contracts/1_Storage.sol": {
+        "content": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.8.2 <0.9.0;\n\n/**\n * @title Storage\n * @dev Store & retrieve value in a variable\n * @custom:dev-run-script ./scripts/deploy_with_ethers.ts\n */\ncontract Storage {\n\n    uint256 number;\n\n    /**\n     * @dev Store value in variable\n     * @param num value to store\n     */\n    function store(uint256 num) public {\n        number = num;\n    }\n\n    /**\n     * @dev Return value \n     * @return value of 'number'\n     */\n    function retrieve() public view returns (uint256){\n        return number;\n    }\n}",
+        "file": "contracts/1_Storage.sol"
+      }
+    }
+  },
+  "contracts/VehicleDatabase.sol": {
+    "__sources__": {
+      "contracts/VehicleDatabase.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.17;\r\n\r\ncontract VehicleDatabase {\r\n    struct Vehicle {\r\n        string licensePlate;\r\n        uint256 mileage;\r\n        string name;\r\n    }\r\n\r\n    Vehicle[] private vehicles;\r\n    mapping(string => uint256) private licensePlateToIndex;\r\n\r\n    event VehicleAdded(string licensePlate, uint256 mileage, string name);\r\n    event VehicleUpdated(string licensePlate, uint256 mileage, string name);\r\n\r\n    function addVehicle(\r\n        string memory _licensePlate,\r\n        uint256 _mileage,\r\n        string memory _name\r\n    ) public {\r\n        require(\r\n            licensePlateToIndex[_licensePlate] == 0,\r\n            \"Vehicle with this license plate already exists\"\r\n        );\r\n\r\n        vehicles.push(\r\n            Vehicle({\r\n                licensePlate: _licensePlate,\r\n                mileage: _mileage,\r\n                name: _name\r\n            })\r\n        );\r\n\r\n        licensePlateToIndex[_licensePlate] = vehicles.length;\r\n        emit VehicleAdded(_licensePlate, _mileage, _name);\r\n    }\r\n\r\n    function getVehicle(string memory _licensePlate)\r\n        public\r\n        view\r\n        returns (string memory, uint256, string memory)\r\n    {\r\n        uint256 index = licensePlateToIndex[_licensePlate];\r\n        require(index > 0, \"Vehicle not found\");\r\n\r\n        Vehicle memory vehicle = vehicles[index - 1];\r\n        return (vehicle.licensePlate, vehicle.mileage, vehicle.name);\r\n    }\r\n\r\n    function getAllVehicles() public view returns (Vehicle[] memory) {\r\n        return vehicles;\r\n    }\r\n\r\n    function updateVehicle(\r\n        string memory _licensePlate,\r\n        uint256 _mileage,\r\n        string memory _name\r\n    ) public {\r\n        uint256 index = licensePlateToIndex[_licensePlate];\r\n        require(index > 0, \"Vehicle not found\");\r\n\r\n        Vehicle storage vehicle = vehicles[index - 1];\r\n        vehicle.mileage = _mileage;\r\n        vehicle.name = _name;\r\n\r\n        emit VehicleUpdated(_licensePlate, _mileage, _name);\r\n    }\r\n}",
+        "file": "contracts/VehicleDatabase.sol"
+      }
+    }
+  },
+  "Lab9/Task/task4.sol": {
+    "__sources__": {
+      "Lab9/Task/task4.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.17;\n\ncontract EvenOdd {\n    function isEven(uint number) public pure returns (bool) {\n        if (number % 2 == 0) {\n            return true;\n        } else {\n            return false;\n        }\n    }\n}\n\n",
+        "file": "Lab9/Task/task4.sol"
+      }
+    }
+  },
+  "Lab9/Task/py_sol.sol": {
+    "__sources__": {
+      "Lab9/Task/py_sol.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.17;\n\ncontract SimpleStorage {\n    uint storedData;\n\n    function set(uint x) public {\n        storedData = x;\n    }\n\n    function get() public view returns (uint) {\n        return storedData;\n    }\n}\n",
+        "file": "Lab9/Task/py_sol.sol"
+      }
+    }
+  },
+  "Lab9/Task/task3.sol": {
+    "__sources__": {
+      "Lab9/Task/task3.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.17;\n\ncontract SimpleStorage {\n    // State variable to store a number\n    uint public num;\n\n    // You need to send a transaction to write to a state variable.\n    function set(uint _num) public {\n        num = _num;\n    }\n\n    // You can read from a state variable without sending a transaction.\n    function get() public view returns (uint) {\n        return num;\n    }\n}",
+        "file": "Lab9/Task/task3.sol"
+      }
+    }
+  },
+  "Lab9/Task/task2.sol": {
+    "__sources__": {
+      "Lab9/Task/task2.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.17;\n\ncontract Counter {\n    uint public count;\n\n    // Function to get the current count\n    function get() public view returns (uint) {\n        return count;\n    }\n\n    // Function to increment count by 1\n    function inc() public {\n        count += 1;\n    }\n\n    // Function to decrement count by 1\n    function dec() public {\n        // This function will fail if count = 0\n        require(count > 0, \"Counter:cannot decrement below zero\");\n        count -= 1;\n    }\n}",
+        "file": "Lab9/Task/task2.sol"
+      }
+    }
+  },
+  "Lab9/Task/task1.sol": {
+    "__sources__": {
+      "Lab9/Task/task1.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.17;\n\ncontract HelloWorld {\n    string public greet = \"Hello World!\";\n}",
+        "file": "Lab9/Task/task1.sol"
+      }
+    }
+  },
+  "Lab9/Task/VehicleDatabase.sol": {
+    "__sources__": {
+      "Lab9/Task/VehicleDatabase.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.17;\r\n\r\ncontract VehicleDatabase {\r\n    \r\n    struct Vehicle {\r\n        string licensePlate;\r\n        uint256 mileage;\r\n        string name;\r\n    }\r\n\r\n    Vehicle[] private vehicles;\r\n\r\n    function addVehicle(\r\n        string memory _licensePlate,\r\n        uint256 _mileage,\r\n        string memory _name\r\n    ) public {\r\n        // Skontrolujeme, či už vozidlo s touto ŠPZ neexistuje\r\n        for (uint256 i = 0; i < vehicles.length; i++) {\r\n            if (\r\n                keccak256(bytes(vehicles[i].licensePlate)) == keccak256(bytes(_licensePlate))\r\n            ) {\r\n                revert(\"Vehicle with this license plate already exists\");\r\n            }\r\n        }\r\n\r\n        // Ak neexistuje, pridáme ho do poľa\r\n        vehicles.push(Vehicle(_licensePlate, _mileage, _name));\r\n    }\r\n\r\n    function getVehicle(string memory _licensePlate) public view returns (string memory, uint256, string memory)\r\n    {\r\n        // Hladame vozidlo podla SPZ\r\n        for (uint256 i = 0; i < vehicles.length; i++) {\r\n            if (\r\n                keccak256(bytes(vehicles[i].licensePlate)) == keccak256(bytes(_licensePlate))\r\n            ) {\r\n                return (\r\n                    vehicles[i].licensePlate,\r\n                    vehicles[i].mileage,\r\n                    vehicles[i].name\r\n                );\r\n            }\r\n        }\r\n\r\n        revert(\"Vehicle not found\");\r\n    }\r\n\r\n    function getAllVehicles() public view returns (Vehicle[] memory) {\r\n        return vehicles;\r\n    }\r\n\r\n    function updateVehicle(string memory _licensePlate, uint256 _mileage, string memory _name\r\n    ) public {\r\n        // Najdeme vozidlo a upravime ho\r\n        for (uint256 i = 0; i < vehicles.length; i++) {\r\n            if (\r\n                keccak256(bytes(vehicles[i].licensePlate)) == keccak256(bytes(_licensePlate))\r\n            ) {\r\n                vehicles[i].mileage = _mileage;\r\n                vehicles[i].name = _name;\r\n                return;\r\n            }\r\n        }\r\n        revert(\"Vehicle not found\");\r\n    }\r\n}",
+        "file": "Lab9/Task/VehicleDatabase.sol"
+      }
+    }
+  },
+  "Lab9/Task/SumInRange.sol": {
+    "__sources__": {
+      "Lab9/Task/SumInRange.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.17;\r\n\r\ncontract SumInRange {\r\n    \r\n    function sum(uint start, uint to) public pure returns (uint) {\r\n        require(to >= start, \"SumInRange: 'to' must be greater than or equal to 'start'\");\r\n        \r\n        uint total = 0;\r\n        for (uint i = start; i <= to; i++) {\r\n            total += i;\r\n        }\r\n        \r\n        return total;\r\n    }\r\n}\r\n",
+        "file": "Lab9/Task/SumInRange.sol"
+      }
+    }
+  },
+  "Lab9/Task/complete.sol": {
+    "__sources__": {
+      "Lab9/Task/complete.sol": {
+        "content": "// SPDX-License-Identifier: GPL-3.0\npragma solidity ^0.8.17;\n\ncontract Purchase {\n    uint public value;\n    address payable public seller;\n    address payable public buyer;\n\n    enum State { Created, Locked, Release, Inactive }\n    // The state variable has a default value of the first member, `State.created`\n    State public state;\n\n    modifier condition(bool condition_) {\n        require(condition_);\n        _;\n    }\n\n    /// Only the buyer can call this function.\n    error OnlyBuyer();\n    /// Only the seller can call this function.\n    error OnlySeller();\n    /// The function cannot be called at the current state.\n    error InvalidState();\n    /// The provided value has to be even.\n    error ValueNotEven();\n\n    modifier onlyBuyer() {\n        if (msg.sender != buyer)\n            revert OnlyBuyer();\n        _;\n    }\n\n    modifier onlySeller() {\n        if (msg.sender != seller)\n            revert OnlySeller();\n        _;\n    }\n\n    modifier inState(State state_) {\n        if (state != state_)\n            revert InvalidState();\n        _;\n    }\n\n    event Aborted();\n    event PurchaseConfirmed();\n    event ItemReceived();\n    event SellerRefunded();\n\n    // Set seller to ethereum address of seller\n    // Ensure that `msg.value` is an even number, it is better to check via division and multiplication that it wasn't an odd number.\n    // Revert \"ValueNotEven()\" if not even.\n    constructor() payable {\n        seller = payable(msg.sender);\n        if ((msg.value / 2) * 2 != msg.value)\n            revert ValueNotEven();\n        value = msg.value / 2;\n    }\n\n    /// Abort the purchase and reclaim the ether.\n    /// Can only be called by the seller before\n    /// the contract is locked.\n    function abort()\n        external\n        onlySeller\n        inState(State.Created)\n    {\n        emit Aborted();\n        state = State.Inactive;\n        // We use transfer here directly. It is\n        // reentrancy-safe, because it is the\n        // last call in this function and we\n        // already changed the state.\n        seller.transfer(address(this).balance);\n    }\n\n    /// Confirm the purchase as buyer.\n    /// Transaction has to include `2 * value` ether.\n    /// The ether will be locked until confirmReceived is called.\n    /// Set state to Locked\n    function confirmPurchase()\n        external \n        payable\n        inState(State.Created)\n        condition(msg.value == 2* value)\n    {\n        emit PurchaseConfirmed();\n        buyer = payable(msg.sender);\n        state = State.Locked;\n    }\n\n    /// Confirm that you (the buyer) received the item.\n    /// This will release the locked ether.\n    function confirmReceived()\n        external\n        onlyBuyer\n        inState(State.Locked)\n    {\n        emit ItemReceived();\n        // It is important to change the state first because\n        // otherwise, the contracts called using `send` below\n        // can call in again here.\n        state = State.Release;\n\n        buyer.transfer(value);\n    }\n\n    /// This function refunds the seller, i.e.\n    /// pays back the locked funds of the seller. Seller will get 3*value\n    function refundSeller()\n        external\n        onlySeller\n        inState(State.Release)\n    {\n        emit SellerRefunded();\n        state = State.Inactive;\n        seller.transfer(3 * value);\n    }\n}",
+        "file": "Lab9/Task/complete.sol"
+      }
+    }
+  }
+}
