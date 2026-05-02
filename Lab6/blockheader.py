@@ -21,15 +21,15 @@ class BlockHeader:
 
     def hash(self):
         # TODO 1: Serialize the block header and hash it
-        version_bytes = self.version.to_bytes(4, byteorder='little')
+        version_bytes = self.version.to_bytes(4, byteorder='little') 
         prev_hash_bytes = bytes.fromhex(self.prev_hash)[::-1]  
         merkle_root = bytes.fromhex(self.merkle_root)[::-1] 
-        ntime_bytes = self.ntime.to_bytes(4, byteorder='little')
-        nbits_bytes = self.nbits.to_bytes(4, byteorder='little')
-        nonce_bytes = self.nonce.to_bytes(4, byteorder='little')
+        ntime_bytes = self.ntime.to_bytes(4, byteorder='little') 
+        nbits_bytes = self.nbits.to_bytes(4, byteorder='little') 
+        nonce_bytes = self.nonce.to_bytes(4, byteorder='little') 
         
         header = version_bytes + prev_hash_bytes + merkle_root + ntime_bytes + nbits_bytes + nonce_bytes
-        hash_result = sha256(sha256(header).digest()).digest()[::-1].hex() 
+        hash_result = sha256(sha256(header).digest()).digest()[::-1].hex()  
         return hash_result
         
         
