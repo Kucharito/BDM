@@ -29,6 +29,7 @@ export default function EventDetail() {
   const [error, setError] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
 
+  // Obnovi data o vybranom evente aj pocet listkov pre pripojenu penazenku.
   const refresh = useCallback(async () => {
     setLoading(true)
     setError('')
@@ -91,6 +92,7 @@ export default function EventDetail() {
     ].join('\n')
   }, [eventItem, account, purchasedCount])
 
+  // Spusti zapisovu akciu, zobrazi uspesnu hlasku a znovu nacita aktualny stav z chainu.
   const runAction = async (action, successMessage) => {
     if (actionLoading) return
 
@@ -108,6 +110,7 @@ export default function EventDetail() {
     }
   }
 
+  // Prevedie zadane mnozstvo na podpisanu buyTickets transakciu.
   const handleBuy = async () => {
     if (!eventItem) return
 

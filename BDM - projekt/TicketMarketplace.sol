@@ -28,11 +28,13 @@ contract TicketMarketplace {
     event FundsWithdrawn(uint256 indexed eventId, uint256 amount);
     event Refunded(uint256 indexed eventId, address indexed buyer, uint256 amount);
 
+    // Povoli vykonanie funkcie len pre ID eventu, ktore uz existuje v mapovani.
     modifier eventExists(uint256 eventId) {
         require(eventId > 0 && eventId <= eventCount, "Event neexistuje");
         _;
     }
 
+    // Chrani kontrakt pred reentrantnym volanim pocas posielania ETH von.
     modifier noReentrant() {
         require(!locked, "Reentrancy zakazana");
         locked = true;
@@ -40,6 +42,7 @@ contract TicketMarketplace {
         locked = false;
     }
 
+    // Ulozi novy event na blockchain a ulozi volajuceho ako organizatora.
     function createEvent(
         string memory _name,
         string memory _description,
@@ -74,6 +77,7 @@ contract TicketMarketplace {
         emit EventCreated(eventCount, msg.sender, _name);
     }
 
+    // Kupi listky po kontrole dostupnosti, casu predaja a presnej poslanej sumy ETH.
     function buyTickets(uint256 eventId, uint256 amount)
         external
         payable
@@ -93,6 +97,7 @@ contract TicketMarketplace {
         emit TicketsBought(eventId, msg.sender, amount);
     }
 
+    // Dovoli len organizatorovi zrusit event skor, nez budu vybrate peniaze.
     function cancelEvent(uint256 eventId) external eventExists(eventId) {
         EventData storage e = eventsData[eventId];
 
@@ -105,6 +110,7 @@ contract TicketMarketplace {
         emit EventCancelled(eventId);
     }
 
+    // Posle vyzbierane peniaze organizatorovi po skonceni predaja alebo po vypredani.
     function withdraw(uint256 eventId)
         external
         eventExists(eventId)
@@ -129,6 +135,7 @@ contract TicketMarketplace {
         emit FundsWithdrawn(eventId, amount);
     }
 
+    // Vrati kupujucemu ETH po zruseni eventu a vynuluje jeho pocet listkov.
     function refund(uint256 eventId)
         external
         eventExists(eventId)

@@ -6,6 +6,7 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
+// Prevedie surove data z ethers tuple do nazvov poli, ktore pouziva React aplikacia.
 function normalizeEvent(rawEvent) {
   if (!rawEvent) return null
 
@@ -25,6 +26,7 @@ function normalizeEvent(rawEvent) {
   }
 }
 
+// Doplni event ID k datam nacitanym z verejneho getteru mapovania v Solidity.
 function normalizeContractEvent(eventId, rawEvent) {
   return normalizeEvent({
     id: eventId,
@@ -42,6 +44,7 @@ function normalizeContractEvent(eventId, rawEvent) {
   })
 }
 
+// Nacita vsetky eventy z chainu tak, ze ide od 1 po eventCount a cita kazdu polozku mapovania.
 export async function getAllEvents() {
   try {
     const contract = await getContractInstance({ withSigner: false })
@@ -57,6 +60,7 @@ export async function getAllEvents() {
   }
 }
 
+// Nacita detail jedneho eventu z chainu a premapuje ho do tvaru pre UI.
 export async function getEventById(eventId) {
   try {
     const contract = await getContractInstance({ withSigner: false })
@@ -67,6 +71,7 @@ export async function getEventById(eventId) {
   }
 }
 
+// Posle createEvent transakciu s hodnotami z formulara prevedenymi do formatu pre kontrakt.
 export async function createEvent(payload) {
   try {
     const contract = await getContractInstance({ withSigner: true })
@@ -87,6 +92,7 @@ export async function createEvent(payload) {
   }
 }
 
+// Posle buyTickets transakciu spolu s presnou ETH hodnotou, ktoru kontrakt ocakava.
 export async function buyTickets(eventId, quantity, ticketPriceWei) {
   if (!quantity || Number(quantity) <= 0) {
     throw new Error('Ticket quantity must be at least 1.')
@@ -106,6 +112,7 @@ export async function buyTickets(eventId, quantity, ticketPriceWei) {
   }
 }
 
+// Zavola vyplatenie organizatora vtedy, ked kontrakt povoli uvolnenie penazi.
 export async function withdrawFunds(eventId) {
   try {
     const contract = await getContractInstance({ withSigner: true })
@@ -116,6 +123,7 @@ export async function withdrawFunds(eventId) {
   }
 }
 
+// Zavola funkciu kontraktu na zrusenie vybraneho eventu.
 export async function cancelEvent(eventId) {
   try {
     const contract = await getContractInstance({ withSigner: true })
@@ -126,6 +134,7 @@ export async function cancelEvent(eventId) {
   }
 }
 
+// Zavola refund pre pripojeneho kupujuceho po tom, co bol event zruseny.
 export async function claimRefund(eventId) {
   try {
     const contract = await getContractInstance({ withSigner: true })
@@ -136,6 +145,7 @@ export async function claimRefund(eventId) {
   }
 }
 
+// Nacita pocty listkov kupujuceho napriec vsetkymi eventmi cez verejny getter ticketsOf.
 export async function getPurchasedTicketsForUser(userAddress) {
   if (!userAddress) return []
 

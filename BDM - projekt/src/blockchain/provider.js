@@ -2,6 +2,7 @@ import { BrowserProvider, Contract } from 'ethers'
 import { CONTRACT_ABI, CONTRACT_ADDRESS, CONTRACT_EVENTS } from './config'
 import { toAppError } from '../utils/errors'
 
+// Kontroluje, ci ma aplikacia nastavenu adresu kontraktu a ABI pre volanie funkcii.
 function assertContractConfig() {
   if (!CONTRACT_ADDRESS) {
     throw new Error('Contract address is missing. Add VITE_CONTRACT_ADDRESS in your .env file.')
@@ -12,10 +13,12 @@ function assertContractConfig() {
   }
 }
 
+// Zisti, ci MetaMask vlozil wallet provider do prehliadaca.
 export function detectMetaMask() {
   return typeof window !== 'undefined' && !!window.ethereum
 }
 
+// Obali MetaMask provider cez ethers, aby zvysok aplikacie pouzival jednotne API.
 export function getProvider() {
   if (!detectMetaMask()) {
     throw new Error('MetaMask is missing.')
@@ -24,6 +27,7 @@ export function getProvider() {
   return new BrowserProvider(window.ethereum)
 }
 
+// Vyziada pripojenie MetaMasku a vrati zvoleny ucet aj aktualnu siet.
 export async function connectWallet() {
   try {
     const provider = getProvider()
@@ -45,6 +49,7 @@ export async function connectWallet() {
   }
 }
 
+// Vrati signer pre transakcie, ktore menia stav blockchainu a vyzaduju podpis pouzivatela.
 export async function getSigner() {
   try {
     const provider = getProvider()
@@ -54,6 +59,7 @@ export async function getSigner() {
   }
 }
 
+// Vytvori ethers Contract instanciu bud pre citanie, alebo pre podpisane zapisove operacie.
 export async function getContractInstance({ withSigner = false } = {}) {
   try {
     assertContractConfig()
@@ -70,6 +76,7 @@ export async function getContractInstance({ withSigner = false } = {}) {
   }
 }
 
+// Prihlasi frontend na eventy kontraktu, aby sa UI obnovilo po zmene na blockchaine.
 export async function listenToContractEvents(onEvent) {
   const contract = await getContractInstance({ withSigner: false })
   const listeners = []
