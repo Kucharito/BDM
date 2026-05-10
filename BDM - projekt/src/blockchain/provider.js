@@ -13,12 +13,12 @@ function assertContractConfig() {
   }
 }
 
-// Zisti, ci MetaMask vlozil wallet provider do prehliadaca.
+// Táto funkcia zisťuje, či má používateľ v prehliadači MetaMask.
 export function detectMetaMask() {
   return typeof window !== 'undefined' && !!window.ethereum
 }
 
-// Obali MetaMask provider cez ethers, aby zvysok aplikacie pouzival jednotne API.
+// Provider je objekt, cez ktorý aplikácia komunikuje s blockchainom.
 export function getProvider() {
   if (!detectMetaMask()) {
     throw new Error('MetaMask is missing.')
@@ -27,7 +27,7 @@ export function getProvider() {
   return new BrowserProvider(window.ethereum)
 }
 
-// Vyziada pripojenie MetaMasku a vrati zvoleny ucet aj aktualnu siet.
+// Toto otvorí MetaMask popup, kde používateľ klikne Connect. Po úspešnom pripojení vráti informácie o pripojenom účte a sieti.
 export async function connectWallet() {
   try {
     const provider = getProvider()
@@ -49,7 +49,7 @@ export async function connectWallet() {
   }
 }
 
-// Vrati signer pre transakcie, ktore menia stav blockchainu a vyzaduju podpis pouzivatela.
+//Signer je objekt, ktorý vie podpisovať transakcie používateľom cez MetaMask.
 export async function getSigner() {
   try {
     const provider = getProvider()
@@ -59,7 +59,7 @@ export async function getSigner() {
   }
 }
 
-// Vytvori ethers Contract instanciu bud pre citanie, alebo pre podpisane zapisove operacie.
+// vytvori objekt kontraktu, Tento objekt potom vie volať funkcie zo smart kontraktu.
 export async function getContractInstance({ withSigner = false } = {}) {
   try {
     assertContractConfig()
@@ -77,6 +77,7 @@ export async function getContractInstance({ withSigner = false } = {}) {
 }
 
 // Prihlasi frontend na eventy kontraktu, aby sa UI obnovilo po zmene na blockchaine.
+//Táto funkcia slúži na počúvanie Solidity eventov.
 export async function listenToContractEvents(onEvent) {
   const contract = await getContractInstance({ withSigner: false })
   const listeners = []

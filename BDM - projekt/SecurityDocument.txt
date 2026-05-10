@@ -1,0 +1,45 @@
+Pri návrhu môjho programu som sa zameral na to, aby boli najdôležitejšie bezpečnostné pravidlá kontrolované 
+priamo v smart kontrakte, nie iba vo frontende. Považujem to za veľmi dôležité, pretože frontend by sa teoreticky 
+dal obísť, ale pravidlá zapísané v kontrakte na blockchaine nie. V kontrakte preto overujem, či event vôbec existuje, 
+a tým zabraňujem práci s neplatným ID eventu (TicketMarketplace.sol (line 35)). Pri vytváraní eventu zároveň kontrolujem, 
+či je zadaný názov, či cena lístka nie je nulová, či je počet lístkov väčší ako nula, či je predajný deadline nastavený do 
+budúcnosti a či sa samotný event koná až po skončení predaja (TicketMarketplace.sol (line 49)). Tým zabezpečujem, že do 
+systému nemožno ukladať nelogické alebo chybné údaje.
+
+Bezpečnosť predaja lístkov riešim tak, že pri nákupe kontrolujem viacero podmienok naraz. Overujem, či event nebol 
+zrušený, či predaj ešte stále prebieha, či kupované množstvo je väčšie ako nula, či sa neprekročí maximálny počet lístkov 
+a či kupujúci poslal presne správnu sumu ETH (TicketMarketplace.sol (line 84)). Vďaka tomu nie je možné kúpiť viac lístkov, 
+než je dostupné, ani zaplatiť nižšiu sumu. Zároveň som doplnil aj kontrolu na úrovni frontendu, kde validujem formulár ešte 
+pred odoslaním transakcie, aby používateľ dostal upozornenie skôr, než sa pokúsi vykonať neplatnú operáciu 
+(CreateEvent.jsx (line 18), EventDetail.jsx (line 114)).
+
+Ochranu finančných prostriedkov som navrhol tak, aby si vyzbierané peniaze mohol vybrať iba organizátor konkrétneho 
+eventu, a to až vtedy, keď sa predaj skončí alebo sa všetky lístky vypredajú (TicketMarketplace.sol (line 117)). 
+Rovnako platí, že zrušiť event môže iba jeho organizátor (TicketMarketplace.sol (line 104)). Ak je event zrušený, 
+refundáciu si môže nárokovať len ten používateľ, ktorý si skutočne zakúpil lístky, pričom po vrátení peňazí sa jeho 
+počet lístkov nastaví na nulu, aby nebolo možné refundáciu zneužiť opakovane (TicketMarketplace.sol (line 142)). 
+Dôležitým bezpečnostným opatrením je aj ochrana proti reentrancy útoku pomocou modifikátora noReentrant, ktorý 
+zabraňuje opakovanému zneužitiu výberu alebo refundácie počas jedného volania (TicketMarketplace.sol (line 41)).
+
+Za dôležitý bezpečnostný prvok považujem aj použitie MetaMask. Môj program totiž neukladá súkromné kľúče používateľov, 
+pretože podpisovanie transakcií prebieha priamo cez peňaženku používateľa (provider.js (line 31)). Tým sa výrazne 
+znižuje riziko zneužitia účtu. Okrem toho aplikácia kontroluje, či je peňaženka pripojená, či používateľ pracuje na 
+správnej sieti, a zrozumiteľne spracúva chybové hlásenia, čo tiež prispieva k bezpečnejšiemu používaniu systému 
+(WalletContext.jsx (line 21), errors.js (line 3)).
+
+Ďalšou vrstvou ochrany je mechanizmus elektronického podpisu pri preukazovaní vlastníctva lístka. Po zakúpení lístka si
+môže používateľ vygenerovať podpísaný dôkaz cez MetaMask, kde sa podpisuje správa obsahujúca adresu kontraktu, ID eventu,
+názov eventu, adresu peňaženky, počet lístkov a čas podpisu (ticketProof.js (line 3), EventDetail.jsx (line 117)).
+Tento dôkaz nevyžaduje tlačený lístok ani ukladanie súkromných kľúčov v aplikácii, pretože podpis prebieha priamo v
+peňaženke používateľa. Organizátor potom môže overiť, či podpis skutočne patrí danej adrese a zároveň, či táto adresa
+stále vlastní lístok na konkrétny event podľa aktuálneho stavu na blockchaine cez kontrolu ticketsOf(eventId, wallet)
+(ticketProof.js (line 34), EventDetail.jsx (line 145)). Tým sa spája kryptografické potvrdenie identity podpisujúceho
+s on-chain overením aktuálneho vlastníctva lístka, čo výrazne znižuje možnosť falšovania alebo neoprávneného použitia
+vstupu.
+
+Na záver môžem povedať, že môj program obsahuje viacero mechanizmov, ktoré bránia bežnému zneužitiu. Ide najmä o 
+kontrolu oprávnení, validáciu vstupov, presnú kontrolu platieb, ochranu proti dvojitému refundu a ochranu proti 
+reentrancy útoku. Zároveň však považujem za korektné uviesť, že pri žiadnom softvéri nie je možné zaručiť absolútnu 
+nezneužiteľnosť. Môžem však povedať, že kritické pravidlá môjho systému sú navrhnuté bezpečne a sú vynucované priamo 
+smart kontraktom, čo výrazne znižuje priestor na manipuláciu alebo neoprávnené zásahy.
+

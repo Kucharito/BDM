@@ -421,6 +421,37 @@ select {
   font-size: 0.88rem;
 }
 
+.proof-fields {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.verification-box {
+  border-radius: 12px;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.35rem;
+}
+
+.verification-box p {
+  margin: 0;
+}
+
+.verification-box.success {
+  background: #ecfdf3;
+  border-color: #abefc6;
+}
+
+.verification-box.error {
+  background: #fef3f2;
+  border-color: #fecdca;
+}
+
+.verification-issue {
+  color: var(--danger);
+}
+
 .action-group {
   margin-top: 1rem;
   display: grid;

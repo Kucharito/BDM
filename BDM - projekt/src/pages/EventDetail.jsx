@@ -12,6 +12,12 @@ import {
   withdrawFunds
 } from '../blockchain/ticketService'
 import { CONTRACT_ADDRESS } from '../blockchain/config'
+import {
+  buildTicketProofMessage,
+  parseTicketProofMessage,
+  recoverTicketProofSigner,
+  signTicketProofMessage
+} from '../blockchain/ticketProof'
 import { useContractEvents } from '../hooks/useContractEvents'
 import { useWallet } from '../hooks/useWallet'
 import { getEventStatus, EVENT_STATUS, statusLabel } from '../utils/eventStatus'
@@ -28,6 +34,10 @@ export default function EventDetail() {
   const [actionLoading, setActionLoading] = useState(false)
   const [error, setError] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
+  const [proofLoading, setProofLoading] = useState(false)
+  const [signedProof, setSignedProof] = useState({ message: '', signature: '' })
+  const [verifyForm, setVerifyForm] = useState({ message: '', signature: '' })
+  const [verificationResult, setVerificationResult] = useState(null)
 
   // Obnovi data o vybranom evente aj pocet listkov pre pripojenu penazenku.
   const refresh = useCallback(async () => {
@@ -80,16 +90,17 @@ export default function EventDetail() {
     !eventItem?.fundsWithdrawn
   const canClaimRefund = isUser && eventStatus === EVENT_STATUS.CANCELLED && purchasedCount > 0
   const eventRevenueWei = useMemo(() => multiplyWei(eventItem?.ticketPrice, eventItem?.soldTickets), [eventItem])
-  const ticketProof = useMemo(() => {
+  const unsignedTicketProof = useMemo(() => {
     if (!eventItem || !account || purchasedCount <= 0) return ''
 
-    return [
-      `TicketMarketplace proof`,
-      `Contract: ${CONTRACT_ADDRESS}`,
-      `Event ID: ${eventItem.id}`,
-      `Wallet: ${account}`,
-      `Tickets: ${purchasedCount}`
-    ].join('\n')
+    return buildTicketProofMessage({
+      contractAddress: CONTRACT_ADDRESS,
+      eventId: eventItem.id,
+      eventTitle: eventItem.title,
+      walletAddress: account,
+      ticketCount: purchasedCount,
+      signedAt: new Date().toISOString()
+    })
   }, [eventItem, account, purchasedCount])
 
   // Spusti zapisovu akciu, zobrazi uspesnu hlasku a znovu nacita aktualny stav z chainu.
@@ -124,6 +135,66 @@ export default function EventDetail() {
       () => buyTickets(eventItem.id, qty, eventItem.ticketPrice),
       'Tickets purchased successfully.'
     )
+  }
+
+  const handleGenerateSignedProof = async () => {
+    if (!unsignedTicketProof) return
+
+    setProofLoading(true)
+    setError('')
+
+    try {
+      const signature = await signTicketProofMessage(unsignedTicketProof)
+      const proof = { message: unsignedTicketProof, signature }
+      setSignedProof(proof)
+      setVerifyForm(proof)
+      setStatusMessage('Signed ticket proof generated successfully.')
+    } catch (err) {
+      setError(err.message || 'Failed to sign ticket proof.')
+    } finally {
+      setProofLoading(false)
+    }
+  }
+
+  const handleVerifyProof = async () => {
+    setVerificationResult(null)
+    setError('')
+
+    try {
+      const parsed = parseTicketProofMessage(verifyForm.message)
+      const recoveredAddress = recoverTicketProofSigner(verifyForm.message, verifyForm.signature)
+      const currentPurchases = await getPurchasedTicketsForUser(parsed.walletAddress)
+      const currentEventPurchase = currentPurchases.find((item) => Number(item.eventId) === Number(eventItem.id))
+      const currentOwned = Number(currentEventPurchase?.quantity || 0)
+      const sameWallet = recoveredAddress.toLowerCase() === parsed.walletAddress.toLowerCase()
+      const sameContract = parsed.contractAddress.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()
+      const sameEvent = Number(parsed.eventId) === Number(eventItem.id)
+
+      setVerificationResult({
+        ok: sameWallet && sameContract && sameEvent && currentOwned > 0,
+        recoveredAddress,
+        parsedWallet: parsed.walletAddress,
+        currentOwned,
+        signedTicketCount: parsed.ticketCount,
+        signedAt: parsed.signedAt,
+        issues: [
+          sameWallet ? '' : 'Podpis nepatri wallet adrese uvedenej v proof.',
+          sameContract ? '' : 'Proof patri k inemu kontraktu.',
+          sameEvent ? '' : 'Proof patri k inemu eventu.',
+          currentOwned > 0 ? '' : 'Wallet uz momentalne nema ziadne listky na tento event.'
+        ].filter(Boolean)
+      })
+    } catch (err) {
+      setVerificationResult({
+        ok: false,
+        recoveredAddress: '',
+        parsedWallet: '',
+        currentOwned: 0,
+        signedTicketCount: 0,
+        signedAt: '',
+        issues: [err.message || 'Nepodarilo sa overit podpis.']
+      })
+    }
   }
 
   if (loading) return <Loader text="Loading event details..." />
@@ -213,8 +284,8 @@ export default function EventDetail() {
           <div>
             <h3>Ticket Proof</h3>
             <p>
-              Show this together with the connected wallet. The organizer can verify it by checking
-              `ticketsOf(eventId, wallet)` on the deployed contract.
+              Vygeneruj podpisany dokaz vlastnictva listka cez MetaMask. Organizator potom moze
+              overit podpis aj aktualny pocet listkov na blockchaine.
             </p>
           </div>
 
@@ -229,7 +300,21 @@ export default function EventDetail() {
             <strong>{shortenAddress(CONTRACT_ADDRESS, 6)}</strong>
           </div>
 
-          <pre className="proof-code">{ticketProof}</pre>
+          <button className="btn" onClick={handleGenerateSignedProof} disabled={proofLoading}>
+            {proofLoading ? 'Signing Proof...' : 'Generate Signed Proof'}
+          </button>
+
+          <div className="proof-fields">
+            <label>
+              Proof message
+              <textarea rows={8} value={signedProof.message || unsignedTicketProof} readOnly />
+            </label>
+
+            <label>
+              Signature
+              <textarea rows={6} value={signedProof.signature} readOnly placeholder="Signature will appear after signing." />
+            </label>
+          </div>
 
           <a
             className="btn btn-secondary"
@@ -239,6 +324,66 @@ export default function EventDetail() {
           >
             Verify on Sepolia Etherscan
           </a>
+        </div>
+      ) : null}
+
+      {(isAdmin || isOrganizer) && eventItem ? (
+        <div className="proof-panel">
+          <div>
+            <h3>Verify Signed Ticket</h3>
+            <p>
+              Vloz podpisanu spravu a podpis od kupujuceho. Aplikacia overi, ci podpis patri danej
+              wallet adrese a ci tato wallet stale vlastni listok na tento event.
+            </p>
+          </div>
+
+          <div className="proof-fields">
+            <label>
+              Signed message
+              <textarea
+                rows={8}
+                value={verifyForm.message}
+                onChange={(e) => setVerifyForm((prev) => ({ ...prev, message: e.target.value }))}
+                placeholder="Paste the signed proof message here."
+              />
+            </label>
+
+            <label>
+              Signature
+              <textarea
+                rows={6}
+                value={verifyForm.signature}
+                onChange={(e) => setVerifyForm((prev) => ({ ...prev, signature: e.target.value }))}
+                placeholder="Paste the MetaMask signature here."
+              />
+            </label>
+          </div>
+
+          <button className="btn btn-secondary" onClick={handleVerifyProof}>
+            Verify Signed Ticket
+          </button>
+
+          {verificationResult ? (
+            <div className={verificationResult.ok ? 'verification-box success' : 'verification-box error'}>
+              <p><strong>Verification status:</strong> {verificationResult.ok ? 'Valid proof' : 'Invalid proof'}</p>
+              {verificationResult.recoveredAddress ? (
+                <p><strong>Recovered signer:</strong> {shortenAddress(verificationResult.recoveredAddress, 6)}</p>
+              ) : null}
+              {verificationResult.parsedWallet ? (
+                <p><strong>Wallet in proof:</strong> {shortenAddress(verificationResult.parsedWallet, 6)}</p>
+              ) : null}
+              <p><strong>Current tickets on-chain:</strong> {verificationResult.currentOwned}</p>
+              {verificationResult.signedTicketCount ? (
+                <p><strong>Tickets in signed proof:</strong> {verificationResult.signedTicketCount}</p>
+              ) : null}
+              {verificationResult.signedAt ? (
+                <p><strong>Signed at:</strong> {verificationResult.signedAt}</p>
+              ) : null}
+              {verificationResult.issues.map((issue) => (
+                <p key={issue} className="verification-issue">{issue}</p>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>

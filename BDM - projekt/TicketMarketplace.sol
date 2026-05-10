@@ -5,6 +5,7 @@ contract TicketMarketplace {
     uint256 public eventCount;
     bool private locked;
 
+    //definovanie ake udaje ma event obsahovat
     struct EventData {
         address payable organizer;
         string name;
@@ -19,22 +20,24 @@ contract TicketMarketplace {
         bool withdrawn;
     }
 
+    //evidovanie eventov a evidovanie kolko listkov ma kto ku ktoremu eventu
     mapping(uint256 => EventData) public eventsData;
     mapping(uint256 => mapping(address => uint256)) public ticketsOf;
 
+    //solidity eventy, Používajú sa na oznámenie, že sa v kontrakte niečo stalo.
     event EventCreated(uint256 indexed eventId, address indexed organizer, string name);
     event TicketsBought(uint256 indexed eventId, address indexed buyer, uint256 amount);
     event EventCancelled(uint256 indexed eventId);
     event FundsWithdrawn(uint256 indexed eventId, uint256 amount);
     event Refunded(uint256 indexed eventId, address indexed buyer, uint256 amount);
 
-    // Povoli vykonanie funkcie len pre ID eventu, ktore uz existuje v mapovani.
+    // Tento modifier kontroluje, či event s daným ID existuje.
     modifier eventExists(uint256 eventId) {
         require(eventId > 0 && eventId <= eventCount, "Event neexistuje");
         _;
     }
 
-    // Chrani kontrakt pred reentrantnym volanim pocas posielania ETH von.
+    //Tým sa zabráni tomu, aby niekto počas vyplácania ETH zavolal tú istú funkciu znova.
     modifier noReentrant() {
         require(!locked, "Reentrancy zakazana");
         locked = true;
@@ -73,7 +76,7 @@ contract TicketMarketplace {
             cancelled: false,
             withdrawn: false
         });
-
+        //Kontrakt oznámi, že bol vytvorený nový event.
         emit EventCreated(eventCount, msg.sender, _name);
     }
 
